@@ -29,13 +29,6 @@ export class AuthService {
         password: bcryptjs.hashSync(password, 10),
         ...userData,
       });
-      // const newUser = new this.userModel(createUserDto);
-
-      // 1 encriptar la contrasenha
-
-      // 2 guardar el usuario
-
-      // 3 Genearar el JWT (Json Web Tocken)
 
       await newUser.save();
 
@@ -51,7 +44,6 @@ export class AuthService {
   }
   async register(registerDto: RegisterUserDto): Promise<LoginResponse> {
     const user = await this.create(registerDto);
-    console.log({ user });
     return {
       user: user,
       token: this.getJwt({ id: user._id }),
@@ -75,12 +67,18 @@ export class AuthService {
 
     return {
       user: rest,
-      token: this.getJwt({ id: user.id }),
+      token: this.getJwt({ id: user._id }),
     };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  findAll(): Promise<User[]> {
+    return this.userModel.find();
+  }
+
+  async findUserById(id: string) {
+    const user = await this.userModel.findById(id);
+    const { password, ...rest } = user.toJSON();
+    return rest;
   }
 
   findOne(id: number) {
