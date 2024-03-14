@@ -13,6 +13,8 @@ import {
 import { AuthGuard } from './guards/auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterUserDto, CreateUserDto, UpdateAuthDto } from './dto';
+import { LoginResponse } from './interfaces/login-response';
+import { User } from './entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -36,13 +38,23 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get()
   findAll(@Request() req: Request) {
-    console.log(req);
     /*     const user = req['user'];
     return user; */
     return this.authService.findAll();
   }
 
-  @Get(':id')
+  // checkear token
+  @UseGuards(AuthGuard)
+  @Get('check-token')
+  checkToken(@Request() req: Request): LoginResponse {
+    const user = req['user'] as User;
+    return {
+      token: this.authService.getJwt({ id: user._id }),
+      user: user,
+    };
+  }
+
+  /* @Get(':id')
   findOne(@Param('id') id: string) {
     return this.authService.findOne(+id);
   }
@@ -55,5 +67,5 @@ export class AuthController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.authService.remove(+id);
-  }
+  } */
 }
